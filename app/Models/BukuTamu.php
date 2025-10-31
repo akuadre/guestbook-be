@@ -4,49 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-
-// use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BukuTamu extends Model
 {
     use HasFactory;
-    // use SoftDeletes;
 
-    protected $table = 'tbl_bukutamu';
+    protected $table = 'bukutamus';
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'nama', 'role', 'idsiswa', 'instansi',
+        'nama', 'role', 'instansi',
         'alamat', 'kontak',
-        // 'idjabatan',
-        'idpegawai', 'keperluan', 'foto_tamu',
-        'idthnajaran',
+        'siswa_id', 'jabatan_id', 'pegawai_id',
+        'keperluan', 'foto_tamu',
     ];
-
-    // public function agama()
-    // {
-    //     return $this->belongsTo(AgamaModel::class, 'idagama', 'idagama');
-    // }
 
     public function siswa()
     {
-        return $this->belongsTo(SiswaModel::class, 'idsiswa', 'idsiswa');
+        return $this->belongsTo(Siswa::class, 'siswa_id');
     }
 
-    // public function jabatan()
-    // {
-    //     return $this->belongsTo(JabatanModel::class, 'idjabatan', 'idjabatan');
-    // }
+    public function jabatan()
+    {
+        return $this->belongsTo(Jabatan::class, 'jabatan_id');
+    }
 
     public function pegawai()
     {
-        return $this->belongsTo(PegawaiModel::class, 'idpegawai', 'idpegawai');
-    }
-
-    // POIN 8: Relasi tahun ajaran
-    public function tahunAjaran()
-    {
-        return $this->belongsTo(TahunAjaranModel::class, 'idthnajaran', 'idthnajaran');
+        return $this->belongsTo(Pegawai::class, 'pegawai_id');
     }
 }
