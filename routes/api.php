@@ -23,7 +23,7 @@ Route::get('/tahun-ajaran-options', [BukuTamuController::class, 'getTahunAjaranO
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/tahun-ajaran', [TahunAjaranController::class, 'index']);
 
-// PROTECTED ROUTES - BUTUH AUTH
+// PROTECTED ROUTES
 Route::middleware(['auth:sanctum'])->group(function () {
     // Auth routes
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -46,7 +46,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Endpoint untuk data Pegawai
     Route::get('/pegawai', [PegawaiController::class, 'index']);
     Route::get('/pegawai/{id}', [PegawaiController::class, 'show']);
-
-    // Endpoint untuk sinkronisasi
-    Route::post('/sync-manual', [SyncController::class, 'triggerSync']);
 });
