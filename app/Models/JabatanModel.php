@@ -10,7 +10,7 @@ class JabatanModel extends Model
     use HasFactory;
 
     protected $table = 'tbl_jabatan';
-    protected $primaryKey = 'idjabatan'; // Primary key adalah idjabatan
+    protected $primaryKey = 'idjabatan';
     protected $fillable = ['idjabatan', 'jabatan'];
     public $incrementing    = false;
 
