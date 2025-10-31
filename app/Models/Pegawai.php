@@ -20,6 +20,11 @@ class Pegawai extends Model
     ];
 
     public function jabatan () {
-        return $this->belongsTo(Jabatan::class, 'jabatan_id', 'id');
+        return $this->belongsTo(Jabatan::class, 'jabatan_id');
+    }
+
+    public function bukutamu()
+    {
+        return $this->hasMany(BukuTamu::class, 'pegawai_id');
     }
 }
