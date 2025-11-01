@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\TahunAjaranModel;
 use Illuminate\Http\Request;
+use App\Models\TahunAjaranModel;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -21,7 +21,6 @@ class AuthController extends Controller
             $validator = Validator::make($request->all(), [
                 'email' => 'required|email',
                 'password' => 'required',
-                'idthnajaran' => 'required|exists:tbl_thnajaran,idthnajaran'
             ]);
 
             if ($validator->fails()) {
@@ -41,16 +40,6 @@ class AuthController extends Controller
             }
 
             $user = User::where('email', $request->email)->first();
-
-            // Validasi tahun ajaran exists
-            $tahunAjaran = TahunAjaranModel::find($request->idthnajaran);
-            if (!$tahunAjaran) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Tahun ajaran tidak valid'
-                ], 422);
-            }
-
             $token = $user->createToken('admin-token')->plainTextToken;
 
             return response()->json([
@@ -64,8 +53,6 @@ class AuthController extends Controller
                     ],
                     'access_token' => $token,
                     'token_type' => 'Bearer',
-                    'idthnajaran' => $request->idthnajaran,
-                    'thnajaran' => $tahunAjaran->thnajaran
                 ]
             ]);
 

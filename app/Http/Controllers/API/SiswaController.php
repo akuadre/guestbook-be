@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Models\SiswaModel;
+use App\Models\Siswa;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 class SiswaController extends Controller
 {
@@ -14,21 +14,20 @@ class SiswaController extends Controller
      */
     public function index(Request $request)
     {
-        $query = SiswaModel::query();
+        $query = Siswa::query();
 
         // Logika pencarian server-side
         if ($request->has('search') && $request->search != '') {
             $searchTerm = $request->search;
             $query->where(function($q) use ($searchTerm) {
                 $q->where('namasiswa', 'like', "%{$searchTerm}%")
-                  ->orWhere('nis', 'like', "%{$searchTerm}%")
-                  ->orWhere('nisn', 'like', "%{$searchTerm}%");
+                  ->orWhere('nis', 'like', "%{$searchTerm}%");
             });
         }
 
         // Ambil rows_per_page dari request, default 10
         $perPage = $request->get('rows_per_page', 10);
-        $siswa = $query->with('thnajaran')->orderBy('namasiswa', 'asc')->paginate($perPage);
+        $siswa = $query->orderBy('nama_siswa', 'asc')->paginate($perPage);
 
         return response()->json($siswa);
     }
@@ -38,30 +37,11 @@ class SiswaController extends Controller
      */
     public function show($idsiswa)
     {
-        // Eager load semua relasi yang dibutuhkan untuk halaman detail.
-        $siswa = SiswaModel::with([
-            'ortu',
-            'agama',
-            'thnajaran',
-            // 'siswakelas',
-            'siswakelas.kelasDetail.kelas',
-            'siswakelas.kelasDetail.thnajaran',
-            'siswakelas.kelasDetail.pegawai'
-        ])->find($idsiswa);
+        $siswa = Siswa::find($idsiswa);
 
         if (!$siswa) {
             return response()->json(['success' => false, 'message' => 'Data siswa tidak ditemukan'], 404);
         }
-
-        // Format riwayat kelas agar lebih rapi untuk frontend
-        $siswa->riwayat_kelas_formatted = $siswa->siswakelas->map(function ($item) {
-            return [
-                'tahun_ajaran' => $item->kelasDetail->thnajaran->thnajaran ?? 'N/A',
-                'nama_kelas' => $item->kelasDetail->kelas->namakelas ?? 'N/A',
-                'wali_kelas' => $item->kelasDetail->pegawai->namapegawai ?? 'N/A',
-            ];
-        });
-
 
         return response()->json([
             'success' => true,

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Models\JabatanModel;
+use App\Models\Jabatan;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Validator;
 
 class JabatanController extends Controller
@@ -16,7 +16,7 @@ class JabatanController extends Controller
      */
     public function index()
     {
-        $jabatan = JabatanModel::all();
+        $jabatan = Jabatan::all();
         return response()->json([
             'success' => true,
             'message' => 'Data jabatan berhasil diambil',
@@ -44,7 +44,7 @@ class JabatanController extends Controller
             ], 422);
         }
 
-        $jabatan = JabatanModel::create($request->all());
+        $jabatan = Jabatan::create($request->all());
 
         return response()->json([
             'success' => true,
@@ -61,7 +61,7 @@ class JabatanController extends Controller
      */
     public function show($id)
     {
-        $jabatan = JabatanModel::find($id);
+        $jabatan = Jabatan::find($id);
 
         if (!$jabatan) {
             return response()->json([
@@ -86,7 +86,7 @@ class JabatanController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $jabatan = JabatanModel::find($id);
+        $jabatan = Jabatan::find($id);
         if (!$jabatan) {
             return response()->json(['success' => false, 'message' => 'Data jabatan tidak ditemukan'], 404);
         }
@@ -116,7 +116,7 @@ class JabatanController extends Controller
      */
     public function destroy($id)
     {
-        $jabatan = JabatanModel::find($id);
+        $jabatan = Jabatan::find($id);
 
         if (!$jabatan) {
             return response()->json([

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Models\PegawaiModel;
+use App\Models\Pegawai;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 class PegawaiController extends Controller
 {
@@ -14,7 +14,7 @@ class PegawaiController extends Controller
      */
     public function index(Request $request)
     {
-        $query = PegawaiModel::query();
+        $query = Pegawai::query();
 
         // Logika pencarian server-side
         if ($request->has('search') && $request->search != '') {
@@ -39,7 +39,7 @@ class PegawaiController extends Controller
     public function show($idpegawai)
     {
         // Eager load semua relasi yang dibutuhkan untuk halaman detail.
-        $pegawai = PegawaiModel::with([
+        $pegawai = Pegawai::with([
             'agama',
             'pangkatpegawai.pangkat',
             'gajiberkala',

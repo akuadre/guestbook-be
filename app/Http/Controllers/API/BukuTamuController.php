@@ -2,21 +2,16 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Models\SiswaModel;
-use App\Models\JabatanModel;
-use App\Models\PegawaiModel;
-use App\Models\JabatanPegawaiModel;
-use App\Models\OrtuModel;
+use Exception;
+use App\Models\Siswa;
+use App\Models\Jabatan;
+use App\Models\Pegawai;
 use App\Models\BukuTamu;
-use App\Models\TahunAjaranModel;
-use App\Models\KelasDetailModel;
-use App\Models\SiswaKelasModel;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -27,12 +22,7 @@ class BukuTamuController extends Controller
      */
     public function index(Request $request)
     {
-        $query = BukuTamu::with(['siswa', 'pegawai', 'tahunAjaran']);
-
-        // Filter berdasarkan tahun ajaran - POIN 8
-        if ($request->has('tahun_ajaran') && $request->tahun_ajaran != '') {
-            $query->where('idthnajaran', $request->tahun_ajaran);
-        }
+        $query = BukuTamu::with(['siswa', 'pegawai']);
 
         // Logika pencarian server-side
         if ($request->has('search') && $request->search != '') {
@@ -46,9 +36,6 @@ class BukuTamuController extends Controller
                   })
                   ->orWhereHas('pegawai', function($q) use ($searchTerm) {
                       $q->where('nama_pegawai', 'like', "%{$searchTerm}%");
-                  })
-                  ->orWhereHas('tahunAjaran', function($q) use ($searchTerm) {
-                      $q->where('thnajaran', 'like', "%{$searchTerm}%");
                   });
             });
         }
@@ -86,14 +73,6 @@ class BukuTamuController extends Controller
         $imageName = null;
         $imageUrlForWa = null;
 
-        // POIN 6: Ambil tahun ajaran aktif
-        $tahunAjaranAktif = TahunAjaranModel::whereRaw('CURDATE() BETWEEN tglmulai AND tglakhir')
-            ->first();
-
-        if (!$tahunAjaranAktif) {
-            return response()->json(['success' => false, 'message' => 'Tidak ada tahun ajaran aktif'], 422);
-        }
-
         // Proses dan simpan foto dari base64
         if ($request->has('foto_tamu') && !empty($request->foto_tamu)) {
             try {
@@ -107,7 +86,7 @@ class BukuTamuController extends Controller
                 $validatedData['foto_tamu'] = $imageName;
                 $imageUrlForWa = Storage::url('foto_tamu/' . $imageName);
 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Gagal menyimpan foto: ' . $e->getMessage());
                 return response()->json(['success' => false, 'message' => 'Gagal memproses foto.'], 500);
             }
@@ -116,11 +95,8 @@ class BukuTamuController extends Controller
         // POIN 7: Hapus field jabatan dari data yang disimpan
         unset($validatedData['id_jabatan']);
 
-        // POIN 6 & 8: Tambahkan idthnajaran
-        $validatedData['idthnajaran'] = $tahunAjaranAktif->idthnajaran;
-
         $bukuTamu = BukuTamu::create($validatedData);
-        $bukuTamu->load(['siswa', 'pegawai', 'tahunAjaran']);
+        $bukuTamu->load(['siswa', 'pegawai']);
 
         // Kirim notifikasi WhatsApp
         // $this->kirimNotifikasiWhatsApp($bukuTamu, $imageUrlForWa);
@@ -137,7 +113,7 @@ class BukuTamuController extends Controller
      */
     public function show($id)
     {
-        $tamu = BukuTamu::with(['siswa', 'pegawai', 'tahunAjaran'])->find($id);
+        $tamu = BukuTamu::with(['siswa', 'pegawai'])->find($id);
 
         if (!$tamu) {
             return response()->json([
@@ -173,129 +149,46 @@ class BukuTamuController extends Controller
     }
 
     /**
-     * Get data untuk form input buku tamu - DENGAN DATA KELAS BERDASARKAN TAHUN AJARAN AKTIF
+     * Get data untuk form input buku tamu
      */
     public function getFormData()
     {
         try {
-            Log::info('Loading form data dengan KELAS BERDASARKAN TAHUN AJARAN AKTIF...');
-
-            // POIN 6: Ambil tahun ajaran aktif
-            $tahunAjaranAktif = TahunAjaranModel::whereRaw('CURDATE() BETWEEN tglmulai AND tglakhir')
-                ->first();
-
-            if (!$tahunAjaranAktif) {
-                Log::warning('Tidak ada tahun ajaran aktif');
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Tidak ada tahun ajaran aktif'
-                ], 422);
-            }
-
-            Log::info('Tahun ajaran aktif: ' . $tahunAjaranAktif->thnajaran);
-
-            // Ambil data siswa dengan kelas berdasarkan tahun ajaran aktif - POIN 6
-            $siswa = SiswaModel::select(
-                    'tbl_siswa.idsiswa',
-                    'tbl_siswa.namasiswa',
-                    'tbl_siswa.nis',
-                    'tbl_siswa.nisn',
-                    'k.namakelas as kelas' // POIN 5 & 6: Ambil kelas dari tabel kelas
-                )
-                ->leftJoin('tbl_siswakelas as sk', function($join) use ($tahunAjaranAktif) {
-                    $join->on('tbl_siswa.idsiswa', '=', 'sk.idsiswa');
-                })
-                ->leftJoin('tbl_kelasdetail as kd', 'sk.idkelasdetail', '=', 'kd.idkelasdetail')
-                ->leftJoin('tbl_kelas as k', 'kd.idkelas', '=', 'k.idkelas')
-                ->where('kd.idthnajaran', $tahunAjaranAktif->idthnajaran)
-                ->get()
-                ->map(function($item) {
-                    return [
-                        'value' => $item->idsiswa,
-                        'label' => $item->namasiswa,
-                        'nis' => $item->nis,
-                        'nisn' => $item->nisn,
-                        'kelas' => $item->kelas ?: '-' // POIN 5: Default value '-'
-                    ];
-                });
-
-            // Data pegawai (tanpa jabatan) - POIN 7
-            $pegawai = PegawaiModel::select(
-                    'idpegawai as id',
-                    'namapegawai as nama_pegawai'
-                )
+            // --- Ambil data siswa ---
+            $siswa = Siswa::select('id', 'nama_siswa', 'nis', 'kelas')
+                ->orderBy('nama_siswa')
                 ->get();
 
-            Log::info('Data loaded dengan tahun ajaran aktif', [
-                'tahun_ajaran' => $tahunAjaranAktif->thnajaran,
-                'siswa_count' => $siswa->count(),
-                'pegawai_count' => $pegawai->count()
-            ]);
+            // --- Ambil data pegawai ---
+            $pegawai = Pegawai::select('id', 'nama_pegawai')
+                ->orderBy('nama_pegawai')
+                ->get();
+
+            // --- Ambil data jabatan ---
+            $jabatan = Jabatan::select('id', 'nama_jabatan')
+                ->orderBy('nama_jabatan')
+                ->get();
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'siswa' => $siswa,
+                    'siswa'   => $siswa,
                     'pegawai' => $pegawai,
-                    'tahun_ajaran_aktif' => [
-                        'idthnajaran' => $tahunAjaranAktif->idthnajaran,
-                        'thnajaran' => $tahunAjaranAktif->thnajaran
-                    ]
-                ]
+                    'jabatan' => $jabatan,
+                ],
             ]);
 
-        } catch (\Exception $e) {
-            Log::error('Error in getFormData: ' . $e->getMessage());
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal mengambil data form: ' . $e->getMessage()
+                'message' => 'Gagal mengambil data form: ' . $e->getMessage(),
             ], 500);
         }
     }
 
-    /**
-     * Get data orangtua berdasarkan siswa - DENGAN RESET KONTAK & ALAMAT
-     */
-    public function getOrangtua($siswaId)
-    {
-        try {
-            Log::info('Getting orangtua for siswa: ' . $siswaId);
-
-            $orangtua = OrtuModel::where('idsiswa', $siswaId)->first();
-
-            // POIN 1: Selalu return dengan kontak dan alamat kosong
-            if ($orangtua) {
-                return response()->json([
-                    'success' => true,
-                    'data' => [
-                        'nama_ortu' => $orangtua->nama_ayah,
-                        'kontak' => '', // POIN 1: Selalu dikosongkan
-                        'alamat' => ''  // POIN 1: Selalu dikosongkan
-                    ]
-                ]);
-            } else {
-                return response()->json([
-                    'success' => true,
-                    'data' => [
-                        'nama_ortu' => '',
-                        'kontak' => '', // POIN 1: Selalu dikosongkan
-                        'alamat' => ''  // POIN 1: Selalu dikosongkan
-                    ]
-                ]);
-            }
-
-        } catch (\Exception $e) {
-            Log::error('Error in getOrangtua: ' . $e->getMessage());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal mengambil data orangtua: ' . $e->getMessage()
-            ], 500);
-        }
-    }
 
     /**
-     * Store data buku tamu dari React - DENGAN PERBAIKAN UNTUK POIN 7
+     * Store data buku tamu dari React
      */
     public function storeUser(Request $request)
     {
@@ -317,17 +210,6 @@ class BukuTamuController extends Controller
                 'all_data' => $request->all()
             ]);
 
-            // POIN 6: Ambil tahun ajaran aktif
-            $tahunAjaranAktif = TahunAjaranModel::whereRaw('CURDATE() BETWEEN tglmulai AND tglakhir')
-                ->first();
-
-            if (!$tahunAjaranAktif) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Tidak ada tahun ajaran aktif'
-                ], 422);
-            }
-
             // Proses foto
             $imageName = null;
             $fotoTamuPath = null;
@@ -347,7 +229,6 @@ class BukuTamuController extends Controller
                 file_put_contents($fotoTamuPath, $imageData);
             }
 
-            // POIN 7: Hapus field jabatan, tambah tahun ajaran
             $bukuTamu = BukuTamu::create([
                 'nama' => $request->nama,
                 'role' => $request->role,
@@ -358,10 +239,7 @@ class BukuTamuController extends Controller
                 'idpegawai' => $request->id_pegawai,
                 'keperluan' => $request->keperluan,
                 'foto_tamu' => $imageName,
-                'idthnajaran' => $tahunAjaranAktif->idthnajaran, // POIN 6 & 8
             ]);
-
-            Log::info('Guestbook data saved successfully: ' . $bukuTamu->id);
 
             // Kirim WhatsApp notification
             // $this->sendWhatsAppNotification($bukuTamu, $fotoTamuPath);
@@ -371,7 +249,7 @@ class BukuTamuController extends Controller
                 'message' => 'Data buku tamu berhasil disimpan!'
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Store guestbook error: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
 
@@ -383,37 +261,13 @@ class BukuTamuController extends Controller
     }
 
     /**
-     * Get data tahun ajaran untuk filter admin - POIN 8
-     */
-    public function getTahunAjaranOptions()
-    {
-        try {
-            $tahunAjaran = TahunAjaranModel::select('idthnajaran as id', 'thnajaran as tahun_ajaran')
-                ->orderBy('tglmulai', 'asc')
-                ->get();
-
-            return response()->json([
-                'success' => true,
-                'data' => $tahunAjaran
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Error getting tahun ajaran options: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal mengambil data tahun ajaran'
-            ], 500);
-        }
-    }
-
-    /**
      * Send WhatsApp notification
      */
     private function sendWhatsAppNotification($bukuTamu, $fotoTamuPath)
     {
         $apiKey = env('FONNTE_API_KEY');
 
-        $pegawai = PegawaiModel::find($bukuTamu->idpegawai);
+        $pegawai = Pegawai::find($bukuTamu->idpegawai);
 
         if ($pegawai && !empty($pegawai->hppegawai)) {
             $nomor = ltrim($pegawai->hppegawai, '0');
@@ -461,7 +315,7 @@ class BukuTamuController extends Controller
                . "Saat ini ada tamu yang ingin bertemu dengan Anda sedang menunggu di Ruang Resepsionis.\n\n";
 
         if ($bukuTamu->role == 'ortu') {
-            $siswa = SiswaModel::find($bukuTamu->idsiswa);
+            $siswa = Siswa::find($bukuTamu->idsiswa);
             $pesan .= "Nama Tamu: {$bukuTamu->nama}.\n"
                    . "Orang tua dari siswa: {$siswa->namasiswa}.\n"
                    . "Dengan Nomor WA: {$bukuTamu->kontak}.\n";
