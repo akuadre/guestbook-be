@@ -36,9 +36,9 @@ class SiswaController extends Controller
     /**
      * Endpoint untuk React: Mengambil detail LENGKAP satu siswa untuk modal popup.
      */
-    public function show($idsiswa)
+    public function show($id)
     {
-        $siswa = Siswa::find($idsiswa);
+        $siswa = Siswa::find($id);
 
         if (!$siswa) {
             return response()->json(['success' => false, 'message' => 'Data siswa tidak ditemukan'], 404);
