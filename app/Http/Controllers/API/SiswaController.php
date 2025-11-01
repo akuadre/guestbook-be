@@ -20,8 +20,9 @@ class SiswaController extends Controller
         if ($request->has('search') && $request->search != '') {
             $searchTerm = $request->search;
             $query->where(function($q) use ($searchTerm) {
-                $q->where('namasiswa', 'like', "%{$searchTerm}%")
-                  ->orWhere('nis', 'like', "%{$searchTerm}%");
+                $q->where('nama_siswa', 'like', "%{$searchTerm}%")
+                  ->orWhere('nis', 'like', "%{$searchTerm}%")
+                  ->orWhere('kelas', 'like', "%{$searchTerm}%");
             });
         }
 
