@@ -66,7 +66,7 @@ class BukuTamuSeeder extends Seeder
                 'kontak' => '081666777888',
                 'siswa_id' => null,
                 'jabatan_id' => 6,
-                'pegawai_id' => 26,
+                'pegawai_id' => 25,
                 'keperluan' => 'Menemui Caraka untuk pengantaran barang',
                 'foto_tamu' => 'foto5.jpg',
             ],
