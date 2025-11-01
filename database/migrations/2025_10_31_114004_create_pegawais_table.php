@@ -13,7 +13,10 @@ return new class extends Migration
     {
         Schema::create('pegawais', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_jabatan');
+            $table->string('nip')->unique()->nullable();
+            $table->string('nama_pegawai');
+            $table->foreignId('jabatan_id')->constrained('jabatans')->onDelete('cascade');
+            $table->string('kontak')->nullable();
             $table->timestamps();
         });
     }
