@@ -3,89 +3,51 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Faker\Factory as Faker;
+use App\Models\Pegawai;
 
 class PegawaiSeeder extends Seeder
 {
     public function run()
     {
-        $faker = Faker::create('id_ID');
+        $data = [
+            // Kepala Sekolah (1 orang)
+            ['nip' => '1987001', 'nama_pegawai' => 'Drs. Suparman', 'jabatan_id' => 1, 'kontak' => '081234567890'],
 
-        // DB::table('tbl_pegawai')->insert([
-        //     ['nama_pegawai' => 'Agus Priyatmono Nugroho', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 1, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Agus Rahmawan', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 3, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Yuli Pamungkas', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 3, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Agus Suratna Permadi', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 3, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Chandra Hardiawan', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 3, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Siti Maryam', 'jenis_kelamin' => 'Perempuan', 'id_jabatan' => 3, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Indra Yusiana', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 3, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Erwin', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 2, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Farid Mulyana', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 2, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Tresna Yogaswara', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 2, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Suyadi', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Mimin Kurniasih', 'jenis_kelamin' => 'Perempuan', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Imron Rosadi', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Iwan Wartiyah', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Rudi Wardoyo', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Marti', 'jenis_kelamin' => 'Perempuan', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Fiska Farida Rustandi', 'jenis_kelamin' => 'Perempuan', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Oman', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Dedi Hadiansyah', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Jayanti Mandalasari', 'jenis_kelamin' => 'Perempuan', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Ahmad Suherman', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 6, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Cecep Saripuloh', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 6, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Didin Saefudin', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 6, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Dandi Kiki Andrian', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 6, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Fajar Hidayah', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 6, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Muhammad Toha', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 6, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Cecep Wahyudin', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 6, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Herry Sudaryan', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 5, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Wahyu Nur Hidayat', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 5, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Peltu Budima', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 5, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Kustiana', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 5, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Rosadi', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 5, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Nunu Isya Ansori', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 5, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Agus Tatang', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 5, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        //     ['nama_pegawai' => 'Andri', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 5, 'id_agama' => 1, 'kontak' => $faker->numerify('08##########')],
-        // ]);
+            // Wakil Kepala Sekolah (4 orang)
+            ['nip' => '1987002', 'nama_pegawai' => 'Siti Marlina', 'jabatan_id' => 2, 'kontak' => '081234567891'],
+            ['nip' => '1987003', 'nama_pegawai' => 'Rudi Hartono', 'jabatan_id' => 2, 'kontak' => '081234567892'],
+            ['nip' => '1987004', 'nama_pegawai' => 'Agus Setiawan', 'jabatan_id' => 2, 'kontak' => '081234567893'],
+            ['nip' => '1987005', 'nama_pegawai' => 'Teguh Prasetyo', 'jabatan_id' => 2, 'kontak' => '081234567894'],
 
-        DB::table('tbl_pegawai')->insert([
-            ['nama_pegawai' => 'Agus Priyatmono Nugroho', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 1, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Agus Rahmawan', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 3, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Yuli Pamungkas', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 3, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Agus Suratna Permadi', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 3, 'id_agama' => 1, 'kontak' => '081395115155'],
-            ['nama_pegawai' => 'Chandra Hardiawan', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 3, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Siti Maryam', 'jenis_kelamin' => 'Perempuan', 'id_jabatan' => 3, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Indra Yusiana', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 3, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Erwin', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 2, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Farid Mulyana', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 2, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Tresna Yogaswara', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 2, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Suyadi', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Mimin Kurniasih', 'jenis_kelamin' => 'Perempuan', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Imron Rosadi', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Iwan Wartiyah', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Rudi Wardoyo', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Marti', 'jenis_kelamin' => 'Perempuan', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Fiska Farida Rustandi', 'jenis_kelamin' => 'Perempuan', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Oman', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Dedi Hadiansyah', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Jayanti Mandalasari', 'jenis_kelamin' => 'Perempuan', 'id_jabatan' => 4, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Ahmad Suherman', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 6, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Cecep Saripuloh', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 6, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Didin Saefudin', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 6, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Dandi Kiki Andrian', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 6, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Fajar Hidayah', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 6, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Muhammad Toha', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 6, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Cecep Wahyudin', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 6, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Herry Sudaryan', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 5, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Wahyu Nur Hidayat', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 5, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Peltu Budima', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 5, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Kustiana', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 5, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Rosadi', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 5, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Nunu Isya Ansori', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 5, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Agus Tatang', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 5, 'id_agama' => 1, 'kontak' => '0'],
-            ['nama_pegawai' => 'Andri', 'jenis_kelamin' => 'Laki-laki', 'id_jabatan' => 5, 'id_agama' => 1, 'kontak' => '0'],
-        ]);
+            // Guru (5 orang)
+            ['nip' => '1987006', 'nama_pegawai' => 'Dewi Lestari', 'jabatan_id' => 3, 'kontak' => '081234567895'],
+            ['nip' => '1987007', 'nama_pegawai' => 'Andi Kurniawan', 'jabatan_id' => 3, 'kontak' => '081234567896'],
+            ['nip' => '1987008', 'nama_pegawai' => 'Rahmawati', 'jabatan_id' => 3, 'kontak' => '081234567897'],
+            ['nip' => '1987009', 'nama_pegawai' => 'Rizal Maulana', 'jabatan_id' => 3, 'kontak' => '081234567898'],
+            ['nip' => '1987010', 'nama_pegawai' => 'Budi Santoso', 'jabatan_id' => 3, 'kontak' => '081234567899'],
+
+            // Tata Usaha (5 orang)
+            ['nip' => '1987011', 'nama_pegawai' => 'Nur Hidayah', 'jabatan_id' => 4, 'kontak' => '081234567900'],
+            ['nip' => '1987012', 'nama_pegawai' => 'Rina Amelia', 'jabatan_id' => 4, 'kontak' => '081234567901'],
+            ['nip' => '1987013', 'nama_pegawai' => 'Dedi Supriadi', 'jabatan_id' => 4, 'kontak' => '081234567902'],
+            ['nip' => '1987014', 'nama_pegawai' => 'Yusuf Maulana', 'jabatan_id' => 4, 'kontak' => '081234567903'],
+            ['nip' => '1987015', 'nama_pegawai' => 'Melati Ayu', 'jabatan_id' => 4, 'kontak' => '081234567904'],
+
+            // Keamanan (5 orang)
+            ['nip' => '1987016', 'nama_pegawai' => 'Darto', 'jabatan_id' => 5, 'kontak' => '081234567905'],
+            ['nip' => '1987017', 'nama_pegawai' => 'Wawan', 'jabatan_id' => 5, 'kontak' => '081234567906'],
+            ['nip' => '1987018', 'nama_pegawai' => 'Ujang', 'jabatan_id' => 5, 'kontak' => '081234567907'],
+            ['nip' => '1987019', 'nama_pegawai' => 'Tatang', 'jabatan_id' => 5, 'kontak' => '081234567908'],
+            ['nip' => '1987020', 'nama_pegawai' => 'Samsul', 'jabatan_id' => 5, 'kontak' => '081234567909'],
+
+            // Caraka (5 orang)
+            ['nip' => '1987021', 'nama_pegawai' => 'Edi', 'jabatan_id' => 6, 'kontak' => '081234567910'],
+            ['nip' => '1987022', 'nama_pegawai' => 'Yanto', 'jabatan_id' => 6, 'kontak' => '081234567911'],
+            ['nip' => '1987023', 'nama_pegawai' => 'Bambang', 'jabatan_id' => 6, 'kontak' => '081234567912'],
+            ['nip' => '1987024', 'nama_pegawai' => 'Ahmad', 'jabatan_id' => 6, 'kontak' => '081234567913'],
+            ['nip' => '1987025', 'nama_pegawai' => 'Heri', 'jabatan_id' => 6, 'kontak' => '081234567914'],
+        ];
+
+        Pegawai::insert($data);
     }
 }

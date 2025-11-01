@@ -2,49 +2,22 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Jabatan;
 
 class JabatanSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
+    public function run()
     {
+        $data = [
+            ['nama_jabatan' => 'Kepala Sekolah'],
+            ['nama_jabatan' => 'Wakil Kepala Sekolah'],
+            ['nama_jabatan' => 'Guru'],
+            ['nama_jabatan' => 'Tata Usaha'],
+            ['nama_jabatan' => 'Keamanan'],
+            ['nama_jabatan' => 'Caraka'],
+        ];
 
-        // Hapus semua data lama
-        // DB::table('tbl_jabatan')->truncate();
-        DB::table('tbl_jabatan')->delete();
-
-        // inserta data ke database
-        DB::table('tbl_jabatan')->insert([
-            [
-                'idjabatan' => 1,
-                'jabatan' => 'Kepala Sekolah',
-            ],
-            [
-                'idjabatan' => 2,
-                'jabatan' => 'Wakil Kepala Sekolah',
-            ],
-            [
-                'idjabatan' => 3,
-                'jabatan' => 'Guru',
-            ],
-            [
-                'idjabatan' => 4,
-                'jabatan' => 'Tata Usaha',
-            ],
-            [
-                'idjabatan' => 5,
-                'jabatan' => 'Keamanan',
-            ],
-            [
-                'idjabatan' => 6,
-                'jabatan' => 'Caraka',
-            ],
-
-        ]);
+        Jabatan::insert($data);
     }
 }

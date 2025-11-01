@@ -2,83 +2,76 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\BukuTamu;
 
 class BukuTamuSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
+    public function run()
     {
-        DB::table('tbl_bukutamu')->insert([
+        $data = [
             [
-                'id' => 1,
-                'nama' => 'Andriana Suryani',
-                'role' => 'umum',
-                'idsiswa' => null,
-                'instansi' => 'PT. Tech Solutions',
-                'alamat' => 'Jl. Raya No. 10, Jakarta Pusat, DKI Jakarta',
-                'kontak' => 'andriana.suryani@techsolutions.com',
-                // 'idjabatan' => 1,
-                'idpegawai' => 1,
-                'idthnajaran' => 4,
-                'keperluan' => 'Pertemuan terkait kolaborasi proyek baru.',
-                'foto_tamu' => 'tamu_1747981588.jpg',
-                'created_at' => '2025-06-13 08:51:02',
-                'updated_at' => '2025-06-13 08:51:02',
+                'nama' => 'Ahmad Yani',
+                'role' => 'Tamu Umum',
+                'instansi' => 'Dinas Pendidikan',
+                'alamat' => 'Jl. Kebon Jeruk No. 5',
+                'kontak' => '081222333444',
+                'siswa_id' => null,
+                'jabatan_id' => 1,
+                'pegawai_id' => 1,
+                'keperluan' => 'Audiensi dengan Kepala Sekolah',
+                'foto_tamu' => 'foto1.jpg',
             ],
-            // [
-            //     'id' => 2,
-            //     'nama' => 'Timothy Ronald',
-            //     'role' => 'umum',
-            //     'idsiswa' => null,
-            //     'instansi' => 'PT. Global Trading',
-            //     'alamat' => 'Jl. Merdeka No.45, Bandung, Jawa Barat',
-            //     'kontak' => 'timothy@globaltrading.com',
-            //     'id_jabatan' => 1,
-            //     'id_pegawai' => 1,
-            //     'idthnajaran' => 4,
-            //     'keperluan' => 'Demo produk dan pembahasan kerjasama bisnis.',
-            //     'foto_tamu' => 'tamu_1747982312.jpg',
-            //     'created_at' => '2025-06-13 12:32:44',
-            //     'updated_at' => '2025-06-13 12:32:44',
-            // ],
-            // [
-            //     'id' => 3,
-            //     'nama' => 'Orang Tua 2',
-            //     'role' => 'ortu',
-            //     'idsiswa' => 2,
-            //     'instansi' => null,
-            //     'alamat' => 'Jl. Kemuning No. 20, Surabaya, Jawa Timur',
-            //     'kontak' => 'budi.santoso@gmail.com',
-            //     'id_jabatan' => 3,
-            //     'id_pegawai' => 4,
-            //     'idthnajaran' => 4,
-            //     'keperluan' => 'Konsultasi mengenai perkembangan akademis anak saya.',
-            //     'foto_tamu' => 'tamu_1748318862.jpg',
-            //     'created_at' => '2025-06-14 10:02:29',
-            //     'updated_at' => '2025-06-14 10:02:29',
-            // ],
-            // [
-            //     'id' => 4,
-            //     'nama' => 'Orang Tua 1',
-            //     'role' => 'ortu',
-            //     'idsiswa' => 1,
-            //     'instansi' => null,
-            //     'alamat' => 'Jl. Batas Kota No. 99, Bandung, Jawa Barat',
-            //     'kontak' => '081366396294',
-            //     'id_jabatan' => 3,
-            //     'id_pegawai' => 4,
-            //     'idthnajaran' => 4,
-            //     'keperluan' => 'Ambil Raport Siswa.',
-            //     'foto_tamu' => 'tamu_1747982278.jpg',
-            //     'created_at' => '2025-06-14 13:04:19',
-            //     'updated_at' => '2025-06-14 13:04:19',
-            // ],
-        ]);
-    }
+            [
+                'nama' => 'Siti Aminah',
+                'role' => 'Orang Tua',
+                'instansi' => null,
+                'alamat' => 'Jl. Mawar No. 6',
+                'kontak' => '081333444555',
+                'siswa_id' => 2,
+                'jabatan_id' => 3,
+                'pegawai_id' => 6,
+                'keperluan' => 'Menemui wali kelas anaknya',
+                'foto_tamu' => 'foto2.jpg',
+            ],
+            [
+                'nama' => 'Bambang Setiawan',
+                'role' => 'Tamu Umum',
+                'instansi' => 'PT Telkom',
+                'alamat' => 'Jl. Gatot Subroto No. 7',
+                'kontak' => '081444555666',
+                'siswa_id' => null,
+                'jabatan_id' => 4,
+                'pegawai_id' => 11,
+                'keperluan' => 'Kunjungan administrasi',
+                'foto_tamu' => 'foto3.jpg',
+            ],
+            [
+                'nama' => 'Rahmat Hidayat',
+                'role' => 'Orang Tua',
+                'instansi' => null,
+                'alamat' => 'Jl. Melati No. 10',
+                'kontak' => '081555666777',
+                'siswa_id' => 5,
+                'jabatan_id' => 3,
+                'pegawai_id' => 8,
+                'keperluan' => 'Mengambil rapor',
+                'foto_tamu' => 'foto4.jpg',
+            ],
+            [
+                'nama' => 'Lina Marlina',
+                'role' => 'Tamu Umum',
+                'instansi' => 'Koperasi Sekolah',
+                'alamat' => 'Jl. Teratai No. 9',
+                'kontak' => '081666777888',
+                'siswa_id' => null,
+                'jabatan_id' => 6,
+                'pegawai_id' => 26,
+                'keperluan' => 'Menemui Caraka untuk pengantaran barang',
+                'foto_tamu' => 'foto5.jpg',
+            ],
+        ];
 
+        BukuTamu::insert($data);
+    }
 }
