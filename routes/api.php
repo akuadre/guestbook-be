@@ -6,22 +6,15 @@ use App\Http\Controllers\API\SiswaController;
 use App\Http\Controllers\API\PegawaiController;
 use App\Http\Controllers\API\BukuTamuController;
 use App\Http\Controllers\API\DashboardController;
-use App\Http\Controllers\API\SyncController;
 use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\TahunAjaranController;
+use App\Http\Controllers\API\JabatanController;
 
 // PUBLIC ROUTES - untuk input buku tamu
 Route::get('/guestbook/data', [BukuTamuController::class, 'getFormData']);
-// Route::get('/get-pegawai/{jabatanId}', [BukuTamuController::class, 'getPegawai']);
-Route::get('/get-orangtua/{siswaId}', [BukuTamuController::class, 'getOrangtua']);
 Route::post('/guestbook/store', [BukuTamuController::class, 'storeUser']);
 
-// ROUTE BARU UNTUK FILTER TAHUN AJARAN - POIN 8
-Route::get('/tahun-ajaran-options', [BukuTamuController::class, 'getTahunAjaranOptions']);
-
-// PUBLIC ROUTES
+// PUBLIC ROUTES - Authentication
 Route::post('/login', [AuthController::class, 'login']);
-Route::get('/tahun-ajaran', [TahunAjaranController::class, 'index']);
 
 // PROTECTED ROUTES
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -29,21 +22,28 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
 
-    // Endpoint untuk resource Buku Tamu
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    // Buku Tamu routes
     Route::get('/bukutamu', [BukuTamuController::class, 'index']);
     Route::get('/bukutamu/grafik', [BukuTamuController::class, 'getGrafikData']);
     Route::get('/bukutamu/{id}', [BukuTamuController::class, 'show']);
     Route::post('/bukutamu', [BukuTamuController::class, 'store']);
     Route::delete('/bukutamu/{id}', [BukuTamuController::class, 'destroy']);
 
-    // Endpoint untuk Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index']);
-
-    // Endpoint untuk data Siswa
+    // Siswa routes
     Route::get('/siswa', [SiswaController::class, 'index']);
     Route::get('/siswa/{id}', [SiswaController::class, 'show']);
 
-    // Endpoint untuk data Pegawai
+    // Pegawai routes
     Route::get('/pegawai', [PegawaiController::class, 'index']);
     Route::get('/pegawai/{id}', [PegawaiController::class, 'show']);
+
+    // Jabatan routes (jika diperlukan)
+    Route::get('/jabatan', [JabatanController::class, 'index']);
+    Route::get('/jabatan/{id}', [JabatanController::class, 'show']);
+    Route::post('/jabatan', [JabatanController::class, 'store']);
+    Route::put('/jabatan/{id}', [JabatanController::class, 'update']);
+    Route::delete('/jabatan/{id}', [JabatanController::class, 'destroy']);
 });
