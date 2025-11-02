@@ -42,8 +42,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Pegawai routes
     Route::get('/pegawai', [PegawaiController::class, 'index']);
     Route::get('/pegawai/{id}', [PegawaiController::class, 'show']);
+    Route::post('/pegawai', [PegawaiController::class, 'store']);
+    Route::put('/pegawai/{id}', [PegawaiController::class, 'update']);
+    Route::delete('/pegawai/{id}', [PegawaiController::class, 'destroy']);
+    Route::get('/pegawai-jabatan/list', [PegawaiController::class, 'getJabatans']); // untuk dropdown jabatan
 
-    // Jabatan routes (jika diperlukan)
+    // Jabatan routes
     Route::get('/jabatan', [JabatanController::class, 'index']);
     Route::get('/jabatan/{id}', [JabatanController::class, 'show']);
     Route::post('/jabatan', [JabatanController::class, 'store']);
