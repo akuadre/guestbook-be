@@ -10,49 +10,48 @@ class PegawaiController extends Controller
 {
     /**
      * Endpoint untuk React: Mengambil daftar pegawai untuk tabel utama.
-     * Mendukung paginasi dan pencarian (server-side).
      */
     public function index(Request $request)
     {
-        $query = Pegawai::query();
+        $query = Pegawai::with('jabatan'); // Eager load jabatan saja
 
         // Logika pencarian server-side
         if ($request->has('search') && $request->search != '') {
             $searchTerm = $request->search;
             $query->where(function($q) use ($searchTerm) {
-                $q->where('namapegawai', 'like', "%{$searchTerm}%")
+                $q->where('nama_pegawai', 'like', "%{$searchTerm}%")
                   ->orWhere('nip', 'like', "%{$searchTerm}%");
             });
         }
 
         $perPage = $request->get('rows_per_page', 10);
+        $pegawai = $query->orderBy('nama_pegawai', 'asc')->paginate($perPage);
 
-        // Eager load relasi yang mungkin dibutuhkan di tabel utama
-        $pegawai = $query->with('agama')->orderBy('namapegawai', 'asc')->paginate($perPage);
-
-        return response()->json($pegawai);
+        return response()->json([
+            'success' => true,
+            'data' => $pegawai->items(),
+            'current_page' => $pegawai->currentPage(),
+            'last_page' => $pegawai->lastPage(),
+            'total' => $pegawai->total(),
+            'from' => $pegawai->firstItem(),
+            'to' => $pegawai->lastItem(),
+        ]);
     }
 
     /**
-     * Endpoint untuk React: Mengambil detail LENGKAP satu pegawai untuk modal popup.
+     * Endpoint untuk React: Mengambil detail pegawai.
      */
-    public function show($idpegawai)
+    public function show($id)
     {
-        // Eager load semua relasi yang dibutuhkan untuk halaman detail.
-        $pegawai = Pegawai::with([
-            'agama',
-            'pangkatpegawai.pangkat',
-            'gajiberkala',
-            'pendidikanpegawai',
-            'keluargapegawai'
-        ])->find($idpegawai);
+        // Hanya load relasi jabatan yang ada di model
+        $pegawai = Pegawai::with('jabatan')->find($id);
 
         if (!$pegawai) {
-            return response()->json(['success' => false, 'message' => 'Data pegawai tidak ditemukan'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Data pegawai tidak ditemukan'
+            ], 404);
         }
-
-        // Format data agar lebih mudah dibaca di frontend
-        $pegawai->nama_lengkap = trim("{$pegawai->gelardepan} {$pegawai->namapegawai} {$pegawai->gelarbelakang}");
 
         return response()->json([
             'success' => true,

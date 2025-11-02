@@ -9,9 +9,8 @@ use App\Models\Pegawai;
 use App\Models\BukuTamu;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -22,7 +21,7 @@ class BukuTamuController extends Controller
      */
     public function index(Request $request)
     {
-        $query = BukuTamu::with(['siswa', 'pegawai']);
+        $query = BukuTamu::with(['siswa', 'pegawai.jabatan']);
 
         // Logika pencarian server-side
         if ($request->has('search') && $request->search != '') {
@@ -32,10 +31,10 @@ class BukuTamuController extends Controller
                   ->orWhere('keperluan', 'like', "%{$searchTerm}%")
                   ->orWhere('kontak', 'like', "%{$searchTerm}%")
                   ->orWhereHas('siswa', function($q) use ($searchTerm) {
-                      $q->where('namasiswa', 'like', "%{$searchTerm}%");
+                      $q->where('nama_siswa', 'like', "%{$searchTerm}%"); // sesuaikan field
                   })
                   ->orWhereHas('pegawai', function($q) use ($searchTerm) {
-                      $q->where('nama_pegawai', 'like', "%{$searchTerm}%");
+                      $q->where('nama_pegawai', 'like', "%{$searchTerm}%"); // sesuaikan field
                   });
             });
         }
@@ -43,7 +42,15 @@ class BukuTamuController extends Controller
         $perPage = $request->get('rows_per_page', 10);
         $bukutamu = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
-        return response()->json($bukutamu);
+        return response()->json([
+            'success' => true,
+            'data' => $bukutamu->items(),
+            'current_page' => $bukutamu->currentPage(),
+            'last_page' => $bukutamu->lastPage(),
+            'total' => $bukutamu->total(),
+            'from' => $bukutamu->firstItem(),
+            'to' => $bukutamu->lastItem(),
+        ]);
     }
 
     /**
@@ -54,24 +61,27 @@ class BukuTamuController extends Controller
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:255',
             'role' => 'required|in:ortu,umum',
-            'idsiswa' => 'required_if:role,ortu|nullable|exists:tbl_siswa,idsiswa',
+            'siswa_id' => 'required_if:role,ortu|nullable|exists:siswas,id', // sesuaikan dengan model
             'instansi' => 'required_if:role,umum|nullable|string|max:255',
             'alamat' => 'required|string',
             'kontak' => 'required|string|max:20',
-            'id_pegawai' => 'required|exists:tbl_pegawai,idpegawai',
+            'pegawai_id' => 'required|exists:pegawais,id', // sesuaikan dengan model
             'keperluan' => 'required|string',
             'foto_tamu' => 'nullable|string',
         ], [
-            'idsiswa.required_if' => 'Nama siswa wajib dipilih jika role adalah Orang Tua.',
+            'siswa_id.required_if' => 'Nama siswa wajib dipilih jika role adalah Orang Tua.',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['success' => false, 'message' => 'Validasi gagal', 'errors' => $validator->errors()], 422);
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
         $validatedData = $validator->validated();
         $imageName = null;
-        $imageUrlForWa = null;
 
         // Proses dan simpan foto dari base64
         if ($request->has('foto_tamu') && !empty($request->foto_tamu)) {
@@ -84,22 +94,18 @@ class BukuTamuController extends Controller
 
                 Storage::disk('public')->put('foto_tamu/' . $imageName, $imageData);
                 $validatedData['foto_tamu'] = $imageName;
-                $imageUrlForWa = Storage::url('foto_tamu/' . $imageName);
 
             } catch (Exception $e) {
                 Log::error('Gagal menyimpan foto: ' . $e->getMessage());
-                return response()->json(['success' => false, 'message' => 'Gagal memproses foto.'], 500);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal memproses foto.'
+                ], 500);
             }
         }
 
-        // POIN 7: Hapus field jabatan dari data yang disimpan
-        unset($validatedData['id_jabatan']);
-
         $bukuTamu = BukuTamu::create($validatedData);
-        $bukuTamu->load(['siswa', 'pegawai']);
-
-        // Kirim notifikasi WhatsApp
-        // $this->kirimNotifikasiWhatsApp($bukuTamu, $imageUrlForWa);
+        $bukuTamu->load(['siswa', 'pegawai.jabatan']);
 
         return response()->json([
             'success' => true,
@@ -113,7 +119,7 @@ class BukuTamuController extends Controller
      */
     public function show($id)
     {
-        $tamu = BukuTamu::with(['siswa', 'pegawai'])->find($id);
+        $tamu = BukuTamu::with(['siswa', 'pegawai.jabatan'])->find($id);
 
         if (!$tamu) {
             return response()->json([
@@ -136,7 +142,10 @@ class BukuTamuController extends Controller
         $bukutamu = BukuTamu::find($id);
 
         if (!$bukutamu) {
-            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan'
+            ], 404);
         }
 
         if ($bukutamu->foto_tamu) {
@@ -145,7 +154,10 @@ class BukuTamuController extends Controller
 
         $bukutamu->delete();
 
-        return response()->json(['success' => true, 'message' => 'Data berhasil dihapus']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Data berhasil dihapus'
+        ]);
     }
 
     /**
@@ -154,17 +166,17 @@ class BukuTamuController extends Controller
     public function getFormData()
     {
         try {
-            // --- Ambil data siswa ---
+            // Ambil data siswa
             $siswa = Siswa::select('id', 'nama_siswa', 'nis', 'kelas')
                 ->orderBy('nama_siswa')
                 ->get();
 
-            // --- Ambil data pegawai ---
+            // Ambil data pegawai
             $pegawai = Pegawai::select('id', 'nama_pegawai')
                 ->orderBy('nama_pegawai')
                 ->get();
 
-            // --- Ambil data jabatan ---
+            // Ambil data jabatan
             $jabatan = Jabatan::select('id', 'nama_jabatan')
                 ->orderBy('nama_jabatan')
                 ->get();
@@ -186,60 +198,47 @@ class BukuTamuController extends Controller
         }
     }
 
-
     /**
-     * Store data buku tamu dari React
+     * Store data buku tamu dari React (public)
      */
     public function storeUser(Request $request)
     {
         try {
-            $request->validate([
+            $validator = Validator::make($request->all(), [
                 'nama' => 'required|string|max:255',
                 'role' => 'required|in:ortu,umum',
-                'idsiswa' => 'nullable|exists:tbl_siswa,idsiswa',
+                'siswa_id' => 'nullable|exists:siswas,id',
                 'instansi' => 'nullable|string|max:255',
                 'alamat' => 'required|string',
                 'kontak' => 'required|string|max:255',
-                'id_pegawai' => 'required|exists:tbl_pegawai,idpegawai',
+                'pegawai_id' => 'required|exists:pegawais,id',
                 'keperluan' => 'required|string',
                 'foto_tamu' => 'nullable|string',
             ]);
 
-            Log::info('Storing guestbook data', [
-                'pegawai_id' => $request->id_pegawai,
-                'all_data' => $request->all()
-            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $validatedData = $validator->validated();
+            $imageName = null;
 
             // Proses foto
-            $imageName = null;
-            $fotoTamuPath = null;
-
             if (!empty($request->foto_tamu)) {
                 $image = str_replace('data:image/jpeg;base64,', '', $request->foto_tamu);
                 $image = str_replace(' ', '+', $image);
                 $imageData = base64_decode($image);
-
-                $folder = 'uploads/foto_tamu';
-                if (!file_exists($folder)) {
-                    mkdir($folder, 0777, true);
-                }
-
                 $imageName = 'tamu_' . time() . '.jpg';
-                $fotoTamuPath = public_path($folder . '/' . $imageName);
-                file_put_contents($fotoTamuPath, $imageData);
+
+                Storage::disk('public')->put('foto_tamu/' . $imageName, $imageData);
+                $validatedData['foto_tamu'] = $imageName;
             }
 
-            $bukuTamu = BukuTamu::create([
-                'nama' => $request->nama,
-                'role' => $request->role,
-                'idsiswa' => $request->idsiswa,
-                'instansi' => $request->instansi,
-                'alamat' => $request->alamat,
-                'kontak' => $request->kontak,
-                'idpegawai' => $request->id_pegawai,
-                'keperluan' => $request->keperluan,
-                'foto_tamu' => $imageName,
-            ]);
+            $bukuTamu = BukuTamu::create($validatedData);
 
             // Kirim WhatsApp notification
             // $this->sendWhatsAppNotification($bukuTamu, $fotoTamuPath);
@@ -251,8 +250,6 @@ class BukuTamuController extends Controller
 
         } catch (Exception $e) {
             Log::error('Store guestbook error: ' . $e->getMessage());
-            Log::error('Stack trace: ' . $e->getTraceAsString());
-
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menyimpan data: ' . $e->getMessage()

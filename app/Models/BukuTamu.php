@@ -15,7 +15,7 @@ class BukuTamu extends Model
     protected $fillable = [
         'nama', 'role', 'instansi',
         'alamat', 'kontak',
-        'siswa_id', 'jabatan_id', 'pegawai_id',
+        'siswa_id', 'pegawai_id',
         'keperluan', 'foto_tamu',
     ];
 
@@ -23,12 +23,7 @@ class BukuTamu extends Model
     {
         return $this->belongsTo(Siswa::class, 'siswa_id');
     }
-
-    public function jabatan()
-    {
-        return $this->belongsTo(Jabatan::class, 'jabatan_id');
-    }
-
+    
     public function pegawai()
     {
         return $this->belongsTo(Pegawai::class, 'pegawai_id');

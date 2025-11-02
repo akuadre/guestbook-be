@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nama_siswa');
             $table->string('nis')->unique();
             $table->string('kelas');
-            $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
+            $table->enum('jenis_kelamin', ['L', 'P']);
             $table->text('alamat');
             $table->string('kontak')->nullable();
             $table->timestamps();
