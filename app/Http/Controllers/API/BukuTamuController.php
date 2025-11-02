@@ -7,6 +7,7 @@ use App\Models\Siswa;
 use App\Models\Jabatan;
 use App\Models\Pegawai;
 use App\Models\BukuTamu;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Http;
@@ -158,6 +159,126 @@ class BukuTamuController extends Controller
             'success' => true,
             'message' => 'Data berhasil dihapus'
         ]);
+    }
+
+    /**
+     * Get grafik data for buku tamu
+     */
+    public function getGrafikData(Request $request)
+    {
+        try {
+            $filterType = $request->get('filter_type', 'harian');
+            $date = $request->get('date', now()->format('Y-m-d'));
+            $month = $request->get('month', now()->month);
+            $year = $request->get('year', now()->year);
+
+            $data = [];
+            $labels = [];
+
+            switch ($filterType) {
+                case 'harian':
+                    // Data per jam dalam sehari
+                    $labels = [
+                        '06:00', '07:00', '08:00', '09:00', '10:00',
+                        '11:00', '12:00', '13:00', '14:00', '15:00',
+                        '16:00', '17:00', '18:00'
+                    ];
+
+                    $data = array_fill(0, count($labels), 0);
+
+                    $visits = BukuTamu::whereDate('created_at', $date)
+                        ->selectRaw('HOUR(created_at) as hour, COUNT(*) as count')
+                        ->groupBy('hour')
+                        ->get()
+                        ->keyBy('hour');
+
+                    foreach ($labels as $index => $label) {
+                        $hour = (int) substr($label, 0, 2);
+                        if ($visits->has($hour)) {
+                            $data[$index] = $visits->get($hour)->count;
+                        }
+                    }
+                    break;
+
+                case 'mingguan':
+                    // Data per hari dalam seminggu
+                    $labels = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+                    $data = array_fill(0, 7, 0);
+
+                    $startOfWeek = Carbon::now()->startOfWeek();
+                    $endOfWeek = Carbon::now()->endOfWeek();
+
+                    $visits = BukuTamu::whereBetween('created_at', [$startOfWeek, $endOfWeek])
+                        ->selectRaw('DAYOFWEEK(created_at) as day, COUNT(*) as count')
+                        ->groupBy('day')
+                        ->get()
+                        ->keyBy('day');
+
+                    // Adjust for Carbon day of week (1=Sunday, 7=Saturday)
+                    foreach ($visits as $day => $visit) {
+                        $adjustedIndex = ($day - 1) % 7;
+                        $data[$adjustedIndex] = $visit->count;
+                    }
+                    break;
+
+                case 'bulanan':
+                    // Data per hari dalam bulan
+                    $daysInMonth = Carbon::create($year, $month)->daysInMonth;
+                    $labels = range(1, $daysInMonth);
+                    $data = array_fill(0, $daysInMonth, 0);
+
+                    $visits = BukuTamu::whereYear('created_at', $year)
+                        ->whereMonth('created_at', $month)
+                        ->selectRaw('DAY(created_at) as day, COUNT(*) as count')
+                        ->groupBy('day')
+                        ->get()
+                        ->keyBy('day');
+
+                    foreach ($visits as $day => $visit) {
+                        $data[$day - 1] = $visit->count;
+                    }
+                    break;
+
+                case 'tahunan':
+                    // Data per bulan dalam tahun
+                    $labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+                    $data = array_fill(0, 12, 0);
+
+                    $visits = BukuTamu::whereYear('created_at', $year)
+                        ->selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+                        ->groupBy('month')
+                        ->get()
+                        ->keyBy('month');
+
+                    foreach ($visits as $month => $visit) {
+                        $data[$month - 1] = $visit->count;
+                    }
+                    break;
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'labels' => $labels,
+                    'datasets' => [
+                        [
+                            'label' => 'Jumlah Tamu',
+                            'data' => $data,
+                            'borderColor' => 'rgba(59, 130, 246, 0.8)',
+                            'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
+                            'fill' => true,
+                            'tension' => 0.4,
+                        ]
+                    ]
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil data grafik: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
