@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('buku_tamus', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->string('role');
+            $table->enum('role', ['ortu', 'umum']);
             $table->string('instansi')->nullable();
             $table->text('alamat');
             $table->string('kontak')->nullable();

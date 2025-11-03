@@ -43,9 +43,43 @@ class BukuTamuController extends Controller
         $perPage = $request->get('rows_per_page', 10);
         $bukutamu = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
+        // Format response
+        $formattedData = $bukutamu->getCollection()->map(function ($tamu) {
+            return [
+                'id' => $tamu->id,
+                'nama' => $tamu->nama,
+                'role' => $tamu->role,
+                'instansi' => $tamu->instansi,
+                'alamat' => $tamu->alamat,
+                'kontak' => $tamu->kontak,
+                'siswa_id' => $tamu->siswa_id,
+                'pegawai_id' => $tamu->pegawai_id,
+                'keperluan' => $tamu->keperluan,
+                'foto_tamu' => $tamu->foto_tamu,
+                'created_at' => $tamu->created_at,
+                'updated_at' => $tamu->updated_at,
+                'siswa' => $tamu->siswa ? [
+                    'id' => $tamu->siswa->id,
+                    'nama_siswa' => $tamu->siswa->nama_siswa,
+                    'nis' => $tamu->siswa->nis,
+                    'kelas' => $tamu->siswa->kelas,
+                ] : null,
+                'pegawai' => $tamu->pegawai ? [
+                    'id' => $tamu->pegawai->id,
+                    'nama_pegawai' => $tamu->pegawai->nama_pegawai,
+                    'nip' => $tamu->pegawai->nip,
+                    'kontak' => $tamu->pegawai->kontak,
+                    'jabatan' => $tamu->pegawai->jabatan ? [
+                        'id' => $tamu->pegawai->jabatan->id,
+                        'nama_jabatan' => $tamu->pegawai->jabatan->nama_jabatan,
+                    ] : null
+                ] : null
+            ];
+        });
+
         return response()->json([
             'success' => true,
-            'data' => $bukutamu->items(),
+            'data' => $formattedData,
             'current_page' => $bukutamu->currentPage(),
             'last_page' => $bukutamu->lastPage(),
             'total' => $bukutamu->total(),

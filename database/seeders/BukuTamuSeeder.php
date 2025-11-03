@@ -12,7 +12,7 @@ class BukuTamuSeeder extends Seeder
         $data = [
             [
                 'nama' => 'Ahmad Yani',
-                'role' => 'Tamu Umum',
+                'role' => 'umum',
                 'instansi' => 'Dinas Pendidikan',
                 'alamat' => 'Jl. Kebon Jeruk No. 5',
                 'kontak' => '081222333444',
@@ -21,10 +21,11 @@ class BukuTamuSeeder extends Seeder
                 'pegawai_id' => 1,
                 'keperluan' => 'Audiensi dengan Kepala Sekolah',
                 'foto_tamu' => 'foto1.jpg',
+                'created_at' => '2025-11-03 08:51:02',
             ],
             [
                 'nama' => 'Siti Aminah',
-                'role' => 'Orang Tua',
+                'role' => 'ortu',
                 'instansi' => null,
                 'alamat' => 'Jl. Mawar No. 6',
                 'kontak' => '081333444555',
@@ -33,10 +34,11 @@ class BukuTamuSeeder extends Seeder
                 'pegawai_id' => 6,
                 'keperluan' => 'Menemui wali kelas anaknya',
                 'foto_tamu' => 'foto2.jpg',
+                'created_at' => '2025-11-03 09:21:04',
             ],
             [
                 'nama' => 'Bambang Setiawan',
-                'role' => 'Tamu Umum',
+                'role' => 'umum',
                 'instansi' => 'PT Telkom',
                 'alamat' => 'Jl. Gatot Subroto No. 7',
                 'kontak' => '081444555666',
@@ -45,10 +47,11 @@ class BukuTamuSeeder extends Seeder
                 'pegawai_id' => 11,
                 'keperluan' => 'Kunjungan administrasi',
                 'foto_tamu' => 'foto3.jpg',
+                'created_at' => '2025-11-03 12:51:42',
             ],
             [
                 'nama' => 'Rahmat Hidayat',
-                'role' => 'Orang Tua',
+                'role' => 'ortu',
                 'instansi' => null,
                 'alamat' => 'Jl. Melati No. 10',
                 'kontak' => '081555666777',
@@ -57,10 +60,11 @@ class BukuTamuSeeder extends Seeder
                 'pegawai_id' => 8,
                 'keperluan' => 'Mengambil rapor',
                 'foto_tamu' => 'foto4.jpg',
+                'created_at' => '2025-11-03 14:20:11',
             ],
             [
                 'nama' => 'Lina Marlina',
-                'role' => 'Tamu Umum',
+                'role' => 'umum',
                 'instansi' => 'Koperasi Sekolah',
                 'alamat' => 'Jl. Teratai No. 9',
                 'kontak' => '081666777888',
@@ -69,6 +73,7 @@ class BukuTamuSeeder extends Seeder
                 'pegawai_id' => 25,
                 'keperluan' => 'Menemui Caraka untuk pengantaran barang',
                 'foto_tamu' => 'foto5.jpg',
+                'created_at' => '2025-11-03 14:40:21',
             ],
         ];
 
