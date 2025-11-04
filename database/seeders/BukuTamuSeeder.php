@@ -4,11 +4,14 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\BukuTamu;
+use Carbon\Carbon;
 
 class BukuTamuSeeder extends Seeder
 {
     public function run()
     {
+        $today = Carbon::now()->toDateString();
+
         $data = [
             [
                 'nama' => 'Ahmad Yani',
@@ -21,7 +24,7 @@ class BukuTamuSeeder extends Seeder
                 'pegawai_id' => 1,
                 'keperluan' => 'Audiensi dengan Kepala Sekolah',
                 'foto_tamu' => 'foto1.jpg',
-                'created_at' => '2025-11-03 08:51:02',
+                'created_at' => Carbon::parse($today . ' 08:51:02'),
             ],
             [
                 'nama' => 'Siti Aminah',
@@ -34,7 +37,7 @@ class BukuTamuSeeder extends Seeder
                 'pegawai_id' => 6,
                 'keperluan' => 'Menemui wali kelas anaknya',
                 'foto_tamu' => 'foto2.jpg',
-                'created_at' => '2025-11-03 09:21:04',
+                'created_at' => Carbon::parse($today . ' 09:21:04'),
             ],
             [
                 'nama' => 'Bambang Setiawan',
@@ -47,7 +50,7 @@ class BukuTamuSeeder extends Seeder
                 'pegawai_id' => 11,
                 'keperluan' => 'Kunjungan administrasi',
                 'foto_tamu' => 'foto3.jpg',
-                'created_at' => '2025-11-03 12:51:42',
+                'created_at' => Carbon::parse($today . ' 12:51:42'),
             ],
             [
                 'nama' => 'Rahmat Hidayat',
@@ -60,7 +63,7 @@ class BukuTamuSeeder extends Seeder
                 'pegawai_id' => 8,
                 'keperluan' => 'Mengambil rapor',
                 'foto_tamu' => 'foto4.jpg',
-                'created_at' => '2025-11-03 14:20:11',
+                'created_at' => Carbon::parse($today . ' 14:20:11'),
             ],
             [
                 'nama' => 'Lina Marlina',
@@ -73,7 +76,7 @@ class BukuTamuSeeder extends Seeder
                 'pegawai_id' => 25,
                 'keperluan' => 'Menemui Caraka untuk pengantaran barang',
                 'foto_tamu' => 'foto5.jpg',
-                'created_at' => '2025-11-03 14:40:21',
+                'created_at' => Carbon::parse($today . ' 14:40:21'),
             ],
         ];
 
