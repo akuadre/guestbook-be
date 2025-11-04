@@ -40,6 +40,16 @@ class BukuTamuController extends Controller
             });
         }
 
+        // Filter berdasarkan role (orang tua/umum)
+        if ($request->has('role') && $request->role != '') {
+            $query->where('role', $request->role);
+        }
+
+        // Filter berdasarkan tanggal (created_at)
+        if ($request->has('date') && $request->date != '') {
+            $query->whereDate('created_at', $request->date);
+        }
+
         $perPage = $request->get('rows_per_page', 10);
         $bukutamu = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
